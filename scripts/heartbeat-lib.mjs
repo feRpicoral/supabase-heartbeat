@@ -18,6 +18,28 @@ export async function loadSql(sqlDir = DEFAULT_SQL_DIR) {
   return { pingSql, setupSql };
 }
 
+export function parseDatabaseUrlLine(rawLine) {
+  const trimmedLine = rawLine.trim();
+
+  if (trimmedLine === '' || trimmedLine.startsWith('#')) {
+    return '';
+  }
+
+  const quote = trimmedLine[0];
+
+  if (quote === '"' || quote === "'") {
+    const closingQuoteIndex = trimmedLine.indexOf(quote, 1);
+
+    if (closingQuoteIndex === -1) {
+      return trimmedLine.slice(1).trim();
+    }
+
+    return trimmedLine.slice(1, closingQuoteIndex).trim();
+  }
+
+  return trimmedLine.split('#', 1)[0].trim();
+}
+
 export function parseDatabaseUrls(rawValue, secretName = ENV_KEYS.databaseUrls) {
   if (!rawValue || rawValue.trim() === '') {
     throw new Error(`${secretName} must contain at least one PostgreSQL URL`);
@@ -28,7 +50,7 @@ export function parseDatabaseUrls(rawValue, secretName = ENV_KEYS.databaseUrls) 
 
   rawValue.split(/\r?\n/).forEach((rawLine, index) => {
     const lineNumber = index + 1;
-    const connectionString = rawLine.trim();
+    const connectionString = parseDatabaseUrlLine(rawLine);
 
     if (connectionString === '') {
       return;
