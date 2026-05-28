@@ -18,8 +18,15 @@ test('sync-gh-secret streams one-url-per-line config into one GitHub secret', as
     'postgresql://postgres.project-a:password@pooler-a.example.com:5432/postgres?sslmode=require',
     'postgresql://postgres.project-b:password@pooler-b.example.com:5432/postgres?sslmode=require',
   ].join('\n');
+  const configValue = [
+    '# Production',
+    'postgresql://postgres.project-a:password@pooler-a.example.com:5432/postgres?sslmode=require # production',
+    '',
+    '  # Staging',
+    '  "postgresql://postgres.project-b:password@pooler-b.example.com:5432/postgres?sslmode=require" # staging  ',
+  ].join('\n');
 
-  await writeFile(configPath, `${secretValue}\n`);
+  await writeFile(configPath, `${configValue}\n`);
   await writeFile(fakeGhPath, [
     '#!/usr/bin/env bash',
     'printf "%s\\n" "$@" > "$FAKE_GH_ARGS"',

@@ -29,6 +29,25 @@ fi
 LINE_NUMBER=0
 while IFS= read -r LINE || [[ -n "${LINE}" ]]; do
   LINE_NUMBER=$((LINE_NUMBER + 1))
+  LINE="${LINE#"${LINE%%[![:space:]]*}"}"
+  LINE="${LINE%"${LINE##*[![:space:]]}"}"
+
+  if [[ -z "${LINE}" || "${LINE}" == \#* ]]; then
+    continue
+  fi
+
+  if [[ "${LINE}" == \"* ]]; then
+    LINE="${LINE#\"}"
+    LINE="${LINE%%\"*}"
+    LINE="${LINE%"${LINE##*[![:space:]]}"}"
+  elif [[ "${LINE}" == \'* ]]; then
+    LINE="${LINE#\'}"
+    LINE="${LINE%%\'*}"
+    LINE="${LINE%"${LINE##*[![:space:]]}"}"
+  else
+    LINE="${LINE%%#*}"
+    LINE="${LINE%"${LINE##*[![:space:]]}"}"
+  fi
 
   if [[ -z "${LINE}" ]]; then
     continue
