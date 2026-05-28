@@ -4,13 +4,13 @@ set -euo pipefail
 CONFIG_FILE="${1:-projects.urls}"
 SECRET_VALUE=""
 PROJECT_COUNT=0
-ENV_FILE="${SUPABASE_HEARTBEAT_ENV_FILE:-.env}"
+SECRET_NAME="SUPABASE_DATABASE_URLS"
 
 if [[ "${CONFIG_FILE}" == "-h" || "${CONFIG_FILE}" == "--help" ]]; then
   echo "usage: scripts/sync-gh-secret.sh [url-list-file]"
   echo
   echo "Reads one PostgreSQL URL per non-empty line and stores them in the"
-  echo "\${SUPABASE_DATABASE_URLS_SECRET_NAME:-SUPABASE_DATABASE_URLS} GitHub Actions secret."
+  echo "SUPABASE_DATABASE_URLS GitHub Actions secret."
   echo
   echo "Set GH_REPO=owner/repo to target a repository other than the current one."
   exit 0
@@ -26,25 +26,6 @@ if ! command -v gh >/dev/null 2>&1; then
   exit 1
 fi
 
-if [[ -f "${ENV_FILE}" ]]; then
-  while IFS='=' read -r KEY VALUE || [[ -n "${KEY}" ]]; do
-    case "${KEY}" in
-      ""|\#*) continue ;;
-      SUPABASE_DATABASE_URLS_SECRET_NAME)
-        if [[ -z "${SUPABASE_DATABASE_URLS_SECRET_NAME:-}" ]]; then
-          VALUE="${VALUE%$'\r'}"
-          VALUE="${VALUE%\"}"
-          VALUE="${VALUE#\"}"
-          VALUE="${VALUE%\'}"
-          VALUE="${VALUE#\'}"
-          SUPABASE_DATABASE_URLS_SECRET_NAME="${VALUE}"
-        fi
-        ;;
-    esac
-  done < "${ENV_FILE}"
-fi
-
-SECRET_NAME="${SUPABASE_DATABASE_URLS_SECRET_NAME:-SUPABASE_DATABASE_URLS}"
 LINE_NUMBER=0
 while IFS= read -r LINE || [[ -n "${LINE}" ]]; do
   LINE_NUMBER=$((LINE_NUMBER + 1))
