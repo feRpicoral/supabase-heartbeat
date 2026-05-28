@@ -30,7 +30,7 @@ export function parseDatabaseUrls(rawValue, secretName = ENV_KEYS.databaseUrls) 
     const lineNumber = index + 1;
     const connectionString = rawLine.trim();
 
-    if (connectionString === '') {
+    if (connectionString === '' || connectionString.startsWith('#')) {
       return;
     }
 

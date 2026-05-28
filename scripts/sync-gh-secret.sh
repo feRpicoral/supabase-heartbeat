@@ -48,8 +48,10 @@ SECRET_NAME="${SUPABASE_DATABASE_URLS_SECRET_NAME:-SUPABASE_DATABASE_URLS}"
 LINE_NUMBER=0
 while IFS= read -r LINE || [[ -n "${LINE}" ]]; do
   LINE_NUMBER=$((LINE_NUMBER + 1))
+  LINE="${LINE#"${LINE%%[![:space:]]*}"}"
+  LINE="${LINE%"${LINE##*[![:space:]]}"}"
 
-  if [[ -z "${LINE}" ]]; then
+  if [[ -z "${LINE}" || "${LINE}" == \#* ]]; then
     continue
   fi
 

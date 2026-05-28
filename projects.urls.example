@@ -1,3 +1,5 @@
+# Add one Supavisor session pooler URL per line.
 postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres?sslmode=require
-postgresql://postgres.OTHER_PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres?sslmode=require
 
+# Blank lines and full-line comments are ignored.
+postgresql://postgres.OTHER_PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres?sslmode=require

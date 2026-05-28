@@ -16,9 +16,14 @@ SUPABASE_HEARTBEAT_CONCURRENCY=4
 Copy `projects.urls.example` to `projects.urls` and replace each line with a Supavisor session pooler URL:
 
 ```text
+# Production
 postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres?sslmode=require
+
+# Staging
 postgresql://postgres.OTHER_PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres?sslmode=require
 ```
+
+Blank lines and full-line comments starting with `#` are ignored.
 
 Use the session pooler on port `5432`. The transaction pooler on port `6543` works for some simple queries but is a worse default because it does not preserve normal session behavior.
 
