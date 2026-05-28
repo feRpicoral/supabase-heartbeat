@@ -126,20 +126,23 @@ export function getHeartbeatId(rawValue) {
 export function getClientConfig(connectionString) {
   const parsedUrl = new URL(connectionString);
 
-  if (!parsedUrl.searchParams.has('sslmode')) {
-    parsedUrl.searchParams.set('sslmode', 'require');
-  }
+  // pg-connection-string maps sslmode=require to verify-full, which rejects Supabase's
+  // self-signed CA chain. Drop sslmode from the URL and drive TLS through the ssl option
+  // so the connection stays encrypted without requiring chain verification.
+  parsedUrl.searchParams.delete('sslmode');
 
   return {
     application_name: 'supabase-heartbeat',
     connectionString: parsedUrl.toString(),
     connectionTimeoutMillis: CONNECT_TIMEOUT_MS,
+    ssl: { rejectUnauthorized: false },
     statement_timeout: STATEMENT_TIMEOUT_MS,
   };
 }
 
 export function redactText(value, connectionStrings = []) {
   let text = String(value);
+  const passwords = new Set();
 
   for (const connectionString of connectionStrings) {
     text = text.split(connectionString).join('[redacted-url]');
@@ -148,12 +151,16 @@ export function redactText(value, connectionStrings = []) {
       const parsedUrl = new URL(connectionString);
 
       if (parsedUrl.password) {
-        text = text.split(parsedUrl.password).join('[redacted-password]');
-        text = text.split(decodeURIComponent(parsedUrl.password)).join('[redacted-password]');
+        passwords.add(parsedUrl.password);
+        passwords.add(decodeURIComponent(parsedUrl.password));
       }
     } catch {
       continue;
     }
+  }
+
+  for (const password of passwords) {
+    text = text.split(password).join('[redacted-password]');
   }
 
   return text;

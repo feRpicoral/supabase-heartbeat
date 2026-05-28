@@ -16,14 +16,16 @@ SUPABASE_HEARTBEAT_CONCURRENCY=4
 Copy `projects.urls.example` to `projects.urls` and replace each line with a Supavisor session pooler URL:
 
 ```text
-postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres?sslmode=require # production
+postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres # production
 
-postgresql://postgres.OTHER_PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres?sslmode=require # staging
+postgresql://postgres.OTHER_PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres # staging
 ```
 
 Blank lines and comments use dotenv-style parsing: `#` starts a comment unless it is inside single or double quotes.
 
 Use the session pooler on port `5432`. The transaction pooler on port `6543` works for some simple queries but is a worse default because it does not preserve normal session behavior.
+
+The heartbeat always connects over TLS and does not verify the server certificate chain, so you do not need to add `sslmode` to the URLs. Any `sslmode` left in a URL is ignored. Certificate verification is skipped because Supabase serves a self-signed CA chain that newer `pg` releases reject under `sslmode=require`.
 
 `.env` and `projects.urls` are ignored and must never be committed.
 

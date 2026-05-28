@@ -1,5 +1,6 @@
 # Add one Supavisor session pooler URL per line. Inline comments work like .env comments.
-postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres?sslmode=require # production
+# TLS is always used, so sslmode is not required; any sslmode in the URL is ignored.
+postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres # production
 
 # Blank lines are ignored. Quote a URL if it needs a literal # character.
-postgresql://postgres.OTHER_PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres?sslmode=require # staging
+postgresql://postgres.OTHER_PROJECT_REF:PASSWORD@aws-0-region.pooler.supabase.com:5432/postgres # staging
