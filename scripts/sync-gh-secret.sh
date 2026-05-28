@@ -55,6 +55,23 @@ while IFS= read -r LINE || [[ -n "${LINE}" ]]; do
     continue
   fi
 
+  if [[ "${LINE}" == \"* ]]; then
+    LINE="${LINE#\"}"
+    LINE="${LINE%%\"*}"
+    LINE="${LINE%"${LINE##*[![:space:]]}"}"
+  elif [[ "${LINE}" == \'* ]]; then
+    LINE="${LINE#\'}"
+    LINE="${LINE%%\'*}"
+    LINE="${LINE%"${LINE##*[![:space:]]}"}"
+  else
+    LINE="${LINE%%#*}"
+    LINE="${LINE%"${LINE##*[![:space:]]}"}"
+  fi
+
+  if [[ -z "${LINE}" ]]; then
+    continue
+  fi
+
   case "${LINE}" in
     postgres://*|postgresql://*) ;;
     *)

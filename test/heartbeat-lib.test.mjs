@@ -7,18 +7,35 @@ import {
   getConcurrency,
   getHeartbeatId,
   loadSql,
+  parseDatabaseUrlLine,
   parseDatabaseUrls,
   redactText,
   runHeartbeat,
 } from '../scripts/heartbeat-lib.mjs';
+
+test('parses URL list comments like dotenv values', () => {
+  assert.equal(
+    parseDatabaseUrlLine('postgresql://postgres.project:password@pooler.example.com:5432/postgres?sslmode=require # comment'),
+    'postgresql://postgres.project:password@pooler.example.com:5432/postgres?sslmode=require',
+  );
+  assert.equal(
+    parseDatabaseUrlLine('postgresql://postgres.project:password@pooler.example.com:5432/postgres?sslmode=require#comment'),
+    'postgresql://postgres.project:password@pooler.example.com:5432/postgres?sslmode=require',
+  );
+  assert.equal(
+    parseDatabaseUrlLine('"postgresql://postgres.project:p%23ssword@pooler.example.com:5432/postgres?sslmode=require" # comment'),
+    'postgresql://postgres.project:p%23ssword@pooler.example.com:5432/postgres?sslmode=require',
+  );
+  assert.equal(parseDatabaseUrlLine('  # comment'), '');
+});
 
 test('parses one PostgreSQL URL per non-empty line', () => {
   const rawValue = [
     '# Production',
     '',
     '  # Staging',
-    'postgresql://postgres.project-a:password@pooler-a.example.com:5432/postgres?sslmode=require',
-    'postgres://postgres.project-b:password@pooler-b.example.com:5432/postgres?sslmode=require',
+    'postgresql://postgres.project-a:password@pooler-a.example.com:5432/postgres?sslmode=require # production',
+    'postgres://postgres.project-b:password@pooler-b.example.com:5432/postgres?sslmode=require#staging',
     '',
   ].join('\n');
 
