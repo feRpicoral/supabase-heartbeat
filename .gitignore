@@ -1,0 +1,4 @@
+.env
+projects.urls
+node_modules/
+.yarn/install-state.gz
