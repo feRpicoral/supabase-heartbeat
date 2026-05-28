@@ -73,11 +73,18 @@ test('warns when a URL uses the transaction pooler port', () => {
   assert.match(parsed.warnings[0], /5432/);
 });
 
-test('adds sslmode=require when it is missing', () => {
+test('connects over TLS without verifying the certificate chain', () => {
   const config = getClientConfig('postgresql://postgres.project:password@pooler.example.com:5432/postgres');
 
-  assert.equal(new URL(config.connectionString).searchParams.get('sslmode'), 'require');
+  assert.deepEqual(config.ssl, { rejectUnauthorized: false });
   assert.equal(config.application_name, 'supabase-heartbeat');
+});
+
+test('strips sslmode so it cannot be reinterpreted as verify-full', () => {
+  const config = getClientConfig('postgresql://postgres.project:password@pooler.example.com:5432/postgres?sslmode=require');
+
+  assert.equal(new URL(config.connectionString).searchParams.has('sslmode'), false);
+  assert.deepEqual(config.ssl, { rejectUnauthorized: false });
 });
 
 test('bounds connect and statement time on the client config', () => {
