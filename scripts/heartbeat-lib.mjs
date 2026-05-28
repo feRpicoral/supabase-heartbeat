@@ -8,6 +8,8 @@ export const ENV_KEYS = {
 
 export const DEFAULT_SQL_DIR = new URL('../sql/', import.meta.url);
 export const TRANSACTION_POOLER_PORT = '6543';
+export const CONNECT_TIMEOUT_MS = 15000;
+export const STATEMENT_TIMEOUT_MS = 15000;
 
 export async function loadSql(sqlDir = DEFAULT_SQL_DIR) {
   const [setupSql, pingSql] = await Promise.all([
@@ -131,6 +133,8 @@ export function getClientConfig(connectionString) {
   return {
     application_name: 'supabase-heartbeat',
     connectionString: parsedUrl.toString(),
+    connectionTimeoutMillis: CONNECT_TIMEOUT_MS,
+    statement_timeout: STATEMENT_TIMEOUT_MS,
   };
 }
 

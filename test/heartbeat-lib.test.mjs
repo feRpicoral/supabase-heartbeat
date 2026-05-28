@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  CONNECT_TIMEOUT_MS,
   ENV_KEYS,
   getClientConfig,
   getConcurrency,
@@ -11,6 +12,7 @@ import {
   parseDatabaseUrls,
   redactText,
   runHeartbeat,
+  STATEMENT_TIMEOUT_MS,
 } from '../scripts/heartbeat-lib.mjs';
 
 test('parses URL list comments like dotenv values', () => {
@@ -76,6 +78,13 @@ test('adds sslmode=require when it is missing', () => {
 
   assert.equal(new URL(config.connectionString).searchParams.get('sslmode'), 'require');
   assert.equal(config.application_name, 'supabase-heartbeat');
+});
+
+test('bounds connect and statement time on the client config', () => {
+  const config = getClientConfig('postgresql://postgres.project:password@pooler.example.com:5432/postgres');
+
+  assert.equal(config.connectionTimeoutMillis, CONNECT_TIMEOUT_MS);
+  assert.equal(config.statement_timeout, STATEMENT_TIMEOUT_MS);
 });
 
 test('parses explicit concurrency', () => {

@@ -11,7 +11,6 @@ const rootDir = new URL('..', import.meta.url).pathname;
 test('sync-gh-secret streams one-url-per-line config into one GitHub secret', async () => {
   const tmpDir = await mkdtemp(join(tmpdir(), 'supabase-heartbeat-'));
   const configPath = join(tmpDir, 'projects.env');
-  const envPath = join(tmpDir, '.env');
   const bodyPath = join(tmpDir, 'body.txt');
   const argsPath = join(tmpDir, 'args.txt');
   const fakeGhPath = join(tmpDir, 'gh');
@@ -28,7 +27,6 @@ test('sync-gh-secret streams one-url-per-line config into one GitHub secret', as
   ].join('\n');
 
   await writeFile(configPath, `${configValue}\n`);
-  await writeFile(envPath, 'SUPABASE_DATABASE_URLS_SECRET_NAME=CUSTOM_DATABASE_URLS\n');
   await writeFile(fakeGhPath, [
     '#!/usr/bin/env bash',
     'printf "%s\\n" "$@" > "$FAKE_GH_ARGS"',
@@ -44,7 +42,6 @@ test('sync-gh-secret streams one-url-per-line config into one GitHub secret', as
       FAKE_GH_ARGS: argsPath,
       FAKE_GH_BODY: bodyPath,
       PATH: `${tmpDir}:${process.env.PATH}`,
-      SUPABASE_HEARTBEAT_ENV_FILE: envPath,
     },
   });
 
@@ -53,8 +50,8 @@ test('sync-gh-secret streams one-url-per-line config into one GitHub secret', as
   const args = await readFile(argsPath, 'utf8');
   const body = await readFile(bodyPath, 'utf8');
 
-  assert.match(args, /secret\nset\nCUSTOM_DATABASE_URLS\n--app\nactions/);
+  assert.match(args, /secret\nset\nSUPABASE_DATABASE_URLS\n--app\nactions/);
   assert.equal(body, `${secretValue}\n`);
-  assert.match(result.stdout, /updated CUSTOM_DATABASE_URLS with 2 PostgreSQL URL/);
+  assert.match(result.stdout, /updated SUPABASE_DATABASE_URLS with 2 PostgreSQL URL/);
   assert.doesNotMatch(result.stdout, /postgresql:\/\//);
 });
