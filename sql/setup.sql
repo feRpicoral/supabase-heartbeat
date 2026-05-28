@@ -1,0 +1,7 @@
+CREATE SCHEMA IF NOT EXISTS heartbeat;
+
+CREATE TABLE IF NOT EXISTS heartbeat.pings (
+  id TEXT PRIMARY KEY,
+  touched_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
