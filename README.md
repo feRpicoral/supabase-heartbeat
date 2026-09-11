@@ -81,6 +81,8 @@ The workflow runs twice per day and can also be started manually from the Action
 
 If one project fails, the rest still run. The job exits with a failure status after all projects finish when any project failed.
 
+A second `keepalive` workflow guards the heartbeat itself. GitHub disables scheduled workflows after 60 days without repository activity, so it checks daily and merges an empty commit once the latest commit is older than 30 days. The margin matters: if every scheduled workflow is disabled, the keepalive is disabled with them and cannot recover on its own.
+
 ## Install
 
 ```sh
